@@ -2,43 +2,148 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Build Your PC</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #0e0e0e;
+      color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .component {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      margin-right: 1rem;
+      font-weight: bold;
+    }
+
+    select {
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: none;
+      background-color: #1a1a1a;
+      color: white;
+    }
+
+    .total {
+      margin-top: 2rem;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    button {
+      background-color: #444;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 1rem;
+    }
+
+    .add-btn {
+      margin-top: 1rem;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Build Your PC</h1>
-    <div id="total">Total: ₹0</div>
+  <h1>Build Your PC</h1>
+  <div id="components-container"></div>
+  <button class="add-btn" onclick="addComponent()">+ Add Component</button>
+  <div class="total" id="total">Total: ₹0</div>
 
-    <div class="part-picker" id="cpu-container">
-      <label for="cpu">CPU:</label>
-      <select id="cpu"></select>
-      <span class="price" id="cpu-price">₹0</span>
-    </div>
+  <script>
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT6wjiYOweHcg7SsiPXU9WVVz8o2DDQT-VGARJe0u-GJA6RWPMMGYruoVnvbQ2xDD2lFF1nSGT104pg/gviz/tq?tqx=out:json';
 
-    <div class="part-picker" id="gpu-container">
-      <label for="gpu">GPU:</label>
-      <select id="gpu"></select>
-      <span class="price" id="gpu-price">₹0</span>
-    </div>
+    let partsData = {};
+    let selectedPrices = [];
 
-    <div class="part-picker" id="motherboard-container">
-      <label for="motherboard">Motherboard:</label>
-      <select id="motherboard"></select>
-      <span class="price" id="motherboard-price">₹0</span>
-    </div>
+    function parseSheetData(data) {
+      const json = JSON.parse(data.substring(47).slice(0, -2));
+      const rows = json.table.rows;
 
-    <div class="part-picker" id="ram-container">
-      <label for="ram">RAM:</label>
-      <select id="ram"></select>
-      <span class="price" id="ram-price">₹0</span>
-    </div>
+      partsData = {};
 
-    <!-- Add more parts here like SSD, PSU, Case, etc. -->
+      rows.forEach(row => {
+        const type = row.c[0]?.v;
+        const name = row.c[1]?.v;
+        const price = parseInt(row.c[2]?.v);
 
-  </div>
+        if (!type || !name || isNaN(price)) return;
 
-  <script src="script.js"></script>
+        if (!partsData[type]) partsData[type] = [];
+        partsData[type].push({ name, price });
+      });
+
+      addComponent(); // Add first component row
+    }
+
+    function addComponent() {
+      const container = document.getElementById('components-container');
+      const wrapper = document.createElement('div');
+      wrapper.className = 'component';
+
+      const typeSelect = document.createElement('select');
+      typeSelect.innerHTML = `<option value="" disabled selected>Select Type</option>`;
+      Object.keys(partsData).forEach(type => {
+        const opt = document.createElement('option');
+        opt.value = type;
+        opt.textContent = type;
+        typeSelect.appendChild(opt);
+      });
+
+      const partSelect = document.createElement('select');
+      const priceDisplay = document.createElement('span');
+      priceDisplay.textContent = ' ₹0';
+
+      typeSelect.onchange = () => {
+        const selectedType = typeSelect.value;
+        partSelect.innerHTML = '';
+        partsData[selectedType].forEach(part => {
+          const opt = document.createElement('option');
+          opt.value = part.price;
+          opt.textContent = part.name;
+          partSelect.appendChild(opt);
+        });
+        partSelect.disabled = false;
+      };
+
+      partSelect.onchange = () => {
+        const price = parseInt(partSelect.value);
+        const index = selectedPrices.indexOf(wrapper._price || 0);
+        if (index > -1) selectedPrices.splice(index, 1);
+        selectedPrices.push(price);
+        wrapper._price = price;
+        priceDisplay.textContent = ` ₹${price}`;
+        updateTotal();
+      };
+
+      partSelect.disabled = true;
+
+      wrapper.appendChild(typeSelect);
+      wrapper.appendChild(partSelect);
+      wrapper.appendChild(priceDisplay);
+      container.appendChild(wrapper);
+    }
+
+    function updateTotal() {
+      const total = selectedPrices.reduce((a, b) => a + b, 0);
+      document.getElementById('total').textContent = `Total: ₹${total}`;
+    }
+
+    // Fetch Google Sheet data on load
+    fetch(SHEET_URL)
+      .then(res => res.text())
+      .then(parseSheetData)
+      .catch(err => console.error('Failed to load sheet:', err));
+  </script>
 </body>
 </html>
