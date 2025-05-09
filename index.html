@@ -1,149 +1,105 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Build Your PC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PC Builder</title>
   <style>
     body {
       background-color: #0e0e0e;
-      color: #ffffff;
+      color: #f0f0f0;
       font-family: 'Segoe UI', sans-serif;
-      padding: 2rem;
+      margin: 0;
+      padding: 1rem;
     }
-
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
+      text-align: center;
+      margin-bottom: 2rem;
     }
-
-    .component {
-      margin-bottom: 1rem;
+    .component-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
     }
-
-    label {
-      margin-right: 1rem;
-      font-weight: bold;
+    .component-card {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 0 10px #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
-
-    select {
-      padding: 0.5rem;
-      border-radius: 5px;
-      border: none;
-      background-color: #1a1a1a;
-      color: white;
+    .component-card h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
     }
-
-    .total {
-      margin-top: 2rem;
-      font-size: 1.8rem;
-      font-weight: bold;
-    }
-
-    button {
-      background-color: #444;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-left: 1rem;
-    }
-
     .add-btn {
       margin-top: 1rem;
+      background-color: #222;
+      color: #0f0;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease-in-out;
+    }
+    .add-btn:hover {
+      background-color: #0f0;
+      color: #000;
     }
   </style>
 </head>
 <body>
-  <h1>Build Your PC</h1>
-  <div id="components-container"></div>
-  <button class="add-btn" onclick="addComponent()">+ Add Component</button>
-  <div class="total" id="total">Total: ₹0</div>
+  <h1>PC Builder</h1>
+  <div class="component-grid">
+    <div class="component-card">
+      <h2>CPU</h2>
+      <p>No CPU selected</p>
+      <button class="add-btn" onclick="selectPart('cpu')">Add</button>
+    </div>
+    <div class="component-card">
+      <h2>GPU</h2>
+      <p>No GPU selected</p>
+      <button class="add-btn" onclick="selectPart('gpu')">Add</button>
+    </div>
+    <div class="component-card">
+      <h2>RAM</h2>
+      <p>No RAM selected</p>
+      <button class="add-btn" onclick="selectPart('ram')">Add</button>
+    </div>
+    <div class="component-card">
+      <h2>SSD</h2>
+      <p>No SSD selected</p>
+      <button class="add-btn" onclick="selectPart('ssd')">Add</button>
+    </div>
+    <div class="component-card">
+      <h2>PSU</h2>
+      <p>No PSU selected</p>
+      <button class="add-btn" onclick="selectPart('psu')">Add</button>
+    </div>
+    <div class="component-card">
+      <h2>Case</h2>
+      <p>No Case selected</p>
+      <button class="add-btn" onclick="selectPart('case')">Add</button>
+    </div>
+    <div class="component-card">
+      <h2>Case Fans</h2>
+      <p>No Case Fans selected</p>
+      <button class="add-btn" onclick="selectPart('fans')">Add</button>
+    </div>
+    <div class="component-card">
+      <h2>Cooler</h2>
+      <p>No Cooler selected</p>
+      <button class="add-btn" onclick="selectPart('cooler')">Add</button>
+    </div>
+  </div>
 
   <script>
-    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT6wjiYOweHcg7SsiPXU9WVVz8o2DDQT-VGARJe0u-GJA6RWPMMGYruoVnvbQ2xDD2lFF1nSGT104pg/gviz/tq?tqx=out:json';
-
-    let partsData = {};
-    let selectedPrices = [];
-
-    function parseSheetData(data) {
-      const json = JSON.parse(data.substring(47).slice(0, -2));
-      const rows = json.table.rows;
-
-      partsData = {};
-
-      rows.forEach(row => {
-        const type = row.c[0]?.v;
-        const name = row.c[1]?.v;
-        const price = parseInt(row.c[2]?.v);
-
-        if (!type || !name || isNaN(price)) return;
-
-        if (!partsData[type]) partsData[type] = [];
-        partsData[type].push({ name, price });
-      });
-
-      addComponent(); // Add first component row
+    function selectPart(category) {
+      window.location.href = `select.html?type=${category}`;
     }
-
-    function addComponent() {
-      const container = document.getElementById('components-container');
-      const wrapper = document.createElement('div');
-      wrapper.className = 'component';
-
-      const typeSelect = document.createElement('select');
-      typeSelect.innerHTML = `<option value="" disabled selected>Select Type</option>`;
-      Object.keys(partsData).forEach(type => {
-        const opt = document.createElement('option');
-        opt.value = type;
-        opt.textContent = type;
-        typeSelect.appendChild(opt);
-      });
-
-      const partSelect = document.createElement('select');
-      const priceDisplay = document.createElement('span');
-      priceDisplay.textContent = ' ₹0';
-
-      typeSelect.onchange = () => {
-        const selectedType = typeSelect.value;
-        partSelect.innerHTML = '';
-        partsData[selectedType].forEach(part => {
-          const opt = document.createElement('option');
-          opt.value = part.price;
-          opt.textContent = part.name;
-          partSelect.appendChild(opt);
-        });
-        partSelect.disabled = false;
-      };
-
-      partSelect.onchange = () => {
-        const price = parseInt(partSelect.value);
-        const index = selectedPrices.indexOf(wrapper._price || 0);
-        if (index > -1) selectedPrices.splice(index, 1);
-        selectedPrices.push(price);
-        wrapper._price = price;
-        priceDisplay.textContent = ` ₹${price}`;
-        updateTotal();
-      };
-
-      partSelect.disabled = true;
-
-      wrapper.appendChild(typeSelect);
-      wrapper.appendChild(partSelect);
-      wrapper.appendChild(priceDisplay);
-      container.appendChild(wrapper);
-    }
-
-    function updateTotal() {
-      const total = selectedPrices.reduce((a, b) => a + b, 0);
-      document.getElementById('total').textContent = `Total: ₹${total}`;
-    }
-
-    // Fetch Google Sheet data on load
-    fetch(SHEET_URL)
-      .then(res => res.text())
-      .then(parseSheetData)
-      .catch(err => console.error('Failed to load sheet:', err));
   </script>
 </body>
 </html>
