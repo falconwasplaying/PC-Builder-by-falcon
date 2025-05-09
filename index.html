@@ -1,111 +1,68 @@
 <!DOCTYPE html><html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <title>PC Builder</title>
-            <style>
-                body {
-                      background-color: #121212;
-                            color: #ffffff;
-                                  font-family: Arial, sans-serif;
-                                        margin: 0;
-                                              padding: 1rem;
-                                                  }
-                                                      h1 {
-                                                            text-align: center;
-                                                                }
-                                                                    select, button {
-                                                                          width: 100%;
-                                                                                padding: 0.75rem;
-                                                                                      margin: 0.5rem 0;
-                                                                                            background-color: #1f1f1f;
-                                                                                                  color: #ffffff;
-                                                                                                        border: 1px solid #444;
-                                                                                                              border-radius: 4px;
-                                                                                                                    font-size: 1rem;
-                                                                                                                        }
-                                                                                                                            .component {
-                                                                                                                                  margin-bottom: 1.5rem;
-                                                                                                                                      }
-                                                                                                                                          .container {
-                                                                                                                                                max-width: 600px;
-                                                                                                                                                      margin: 0 auto;
-                                                                                                                                                          }
-                                                                                                                                                              .price-display {
-                                                                                                                                                                    font-size: 1.25rem;
-                                                                                                                                                                          margin-top: 0.5rem;
-                                                                                                                                                                              }
-                                                                                                                                                                                </style>
-                                                                                                                                                                                </head>
-                                                                                                                                                                                <body>
-                                                                                                                                                                                  <div class="container">
-                                                                                                                                                                                      <h1>PC Builder</h1>
-                                                                                                                                                                                          <div id="components"></div>
-                                                                                                                                                                                              <h2>Total Price: ₹<span id="total-price">0</span></h2>
-                                                                                                                                                                                                </div>  <script>
-                                                                                                                                                                                                    const SHEET_ID = "1xJYXdAL55NAv6uiFdqg6KGbnnP4MS7oNsUo78k2b1WE";
-                                                                                                                                                                                                        const SHEET_NAME = "Sheet1";
-                                                                                                                                                                                                            const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
-
-                                                                                                                                                                                                                async function fetchData() {
-                                                                                                                                                                                                                      const res = await fetch(SHEET_URL);
-                                                                                                                                                                                                                            const text = await res.text();
-                                                                                                                                                                                                                                  const json = JSON.parse(text.substr(47).slice(0, -2));
-                                                                                                                                                                                                                                        const rows = json.table.rows;
-
-                                                                                                                                                                                                                                              const components = {};
-
-                                                                                                                                                                                                                                                    rows.forEach(row => {
-                                                                                                                                                                                                                                                            const [component, manufacturer, brand, model, store, price] = row.c.map(cell => cell?.v || "");
-                                                                                                                                                                                                                                                                    if (!components[component]) components[component] = [];
-                                                                                                                                                                                                                                                                            components[component].push({ manufacturer, brand, model, store, price });
-                                                                                                                                                                                                                                                                                  });
-
-                                                                                                                                                                                                                                                                                        return components;
-                                                                                                                                                                                                                                                                                            }
-
-                                                                                                                                                                                                                                                                                                function updateTotal() {
-                                                                                                                                                                                                                                                                                                      const selects = document.querySelectorAll("select");
-                                                                                                                                                                                                                                                                                                            let total = 0;
-                                                                                                                                                                                                                                                                                                                  selects.forEach(select => {
-                                                                                                                                                                                                                                                                                                                          const option = select.options[select.selectedIndex];
-                                                                                                                                                                                                                                                                                                                                  if (option && option.dataset.price) {
-                                                                                                                                                                                                                                                                                                                                            total += parseFloat(option.dataset.price);
-                                                                                                                                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                                                                                                                                          });
-                                                                                                                                                                                                                                                                                                                                                                document.getElementById("total-price").textContent = total.toFixed(2);
-                                                                                                                                                                                                                                                                                                                                                                    }
-
-                                                                                                                                                                                                                                                                                                                                                                        function createComponentDropdown(name, items) {
-                                                                                                                                                                                                                                                                                                                                                                              const div = document.createElement("div");
-                                                                                                                                                                                                                                                                                                                                                                                    div.className = "component";
-
-                                                                                                                                                                                                                                                                                                                                                                                          const label = document.createElement("label");
-                                                                                                                                                                                                                                                                                                                                                                                                label.textContent = name;
-
-                                                                                                                                                                                                                                                                                                                                                                                                      const select = document.createElement("select");
-                                                                                                                                                                                                                                                                                                                                                                                                            select.addEventListener("change", updateTotal);
-
-                                                                                                                                                                                                                                                                                                                                                                                                                  items.forEach(item => {
-                                                                                                                                                                                                                                                                                                                                                                                                                          const opt = document.createElement("option");
-                                                                                                                                                                                                                                                                                                                                                                                                                                  opt.textContent = `${item.model} (${item.store}) - ₹${item.price}`;
-                                                                                                                                                                                                                                                                                                                                                                                                                                          opt.dataset.price = item.price;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                  select.appendChild(opt);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                        });
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                              div.appendChild(label);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                    div.appendChild(select);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          document.getElementById("components").appendChild(div);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                              }
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  async function init() {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const data = await fetchData();
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              for (const [component, items] of Object.entries(data)) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      createComponentDropdown(component, items);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  updateTotal();
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      }
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          init();
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </script></body>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PC Builder</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #111;
+      color: white;
+      margin: 0;
+      padding: 1rem;
+    }
+    h1 {
+      text-align: center;
+    }
+    .component {
+      margin-bottom: 1.2rem;
+    }
+    select {
+      width: 100%;
+      padding: 0.7rem;
+      background-color: #222;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    @media (min-width: 600px) {
+      body {
+        max-width: 600px;
+        margin: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>PC Builder</h1>  <div class="component">
+    <label>CPU</label>
+    <select>
+      <option>Intel (Core i5 12400F) - ₹13,500</option>
+    </select>
+  </div>  <div class="component">
+    <label>GPU</label>
+    <select>
+      <option>Gigabyte AERO RTX 4070 OC - ₹65,000 (White)</option>
+    </select>
+  </div>  <div class="component">
+    <label>SSD</label>
+    <select>
+      <option>Acer GM7000 1TB DRAMC - ₹7,300 (Black)</option>
+    </select>
+  </div>  <div class="component">
+    <label>PSU</label>
+    <select>
+      <option>Deepcool PN850M ATX 3.1 Gold - ₹9,500</option>
+    </select>
+  </div>  <div class="component">
+    <label>RAM</label>
+    <select>
+      <option>Acer Pallas II 16GB 6000mhz CL30 OC - ₹3,900</option>
+    </select>
+  </div>  <div class="component">
+    <label>Case</label>
+    <select>
+      <option>Montech Air 100 ARGB - ₹3,200 (White)</option>
+    </select>
+  </div></body>
+</html>
