@@ -1,69 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Custom PC Part Picker</title>
-  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.6.4/tabletop.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    body {
-      background-color: #121212;
-      color: #e0e0e0;
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .component-section {
-      margin-bottom: 30px;
-      background-color: #1e1e1e;
-      padding: 20px;
-      border-radius: 10px;
-    }
-
-    .component-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    button {
-      background-color: #2a2a2a;
-      color: #fff;
-      border: 1px solid #444;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    select {
-      background-color: #2a2a2a;
-      color: #fff;
-      border: 1px solid #444;
-      padding: 6px;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-
-    .total-price {
-      font-size: 24px;
-      text-align: center;
-      margin-top: 30px;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Build Your PC</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Build Your PC</h1>
-  <div id="components"></div>
-  <div class="total-price">Total: ₹<span id="total">0</span></div>
+  <div class="container">
+    <h1>Build Your PC</h1>
+    <div id="total">Total: ₹0</div>
 
-  <script src="app.js"></script>
+    <div class="part-picker" id="cpu-container">
+      <label for="cpu">CPU:</label>
+      <select id="cpu"></select>
+      <span class="price" id="cpu-price">₹0</span>
+    </div>
+
+    <div class="part-picker" id="gpu-container">
+      <label for="gpu">GPU:</label>
+      <select id="gpu"></select>
+      <span class="price" id="gpu-price">₹0</span>
+    </div>
+
+    <div class="part-picker" id="motherboard-container">
+      <label for="motherboard">Motherboard:</label>
+      <select id="motherboard"></select>
+      <span class="price" id="motherboard-price">₹0</span>
+    </div>
+
+    <div class="part-picker" id="ram-container">
+      <label for="ram">RAM:</label>
+      <select id="ram"></select>
+      <span class="price" id="ram-price">₹0</span>
+    </div>
+
+    <!-- Add more parts here like SSD, PSU, Case, etc. -->
+
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
