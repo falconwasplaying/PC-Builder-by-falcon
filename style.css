@@ -1,0 +1,48 @@
+body {
+  background-color: #0e0e0e;
+  color: #f0f0f0;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 1rem;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.component-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+    }
+
+.component-card {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 0 10px #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+    }
+.component-card h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+}
+
+.add-btn {
+  margin-top: 1rem;
+  background-color: #222;
+  color: #0f0;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.add-btn:hover {
+  background-color: #0f0;
+  color: #000;
+}
